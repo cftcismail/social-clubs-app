@@ -122,6 +122,37 @@ veya:
 ./scripts/reset-db.ps1
 ```
 
+## Nginx Reverse Proxy + SSL (Let's Encrypt)
+
+Bu proje Docker içinde `nginx` reverse proxy ve `certbot` ile Let's Encrypt SSL desteğiyle çalışacak şekilde hazırlanmıştır.
+
+### Gereksinimler
+
+- Domain DNS kaydı sunucu IP adresinize yönlenmiş olmalı.
+- Sunucuda `80` ve `443` portları açık olmalı.
+- Docker Desktop / Docker Engine çalışıyor olmalı.
+
+### Kurulum Akışı (Tek Komut)
+
+PowerShell ile:
+
+```powershell
+./scripts/init-ssl.ps1 -Domain example.com -Email devops@example.com
+```
+
+Bu komut sırasıyla:
+
+1. `postgres + app + nginx` stack'ini başlatır.
+2. Let's Encrypt sertifikasını `certbot` ile üretir.
+3. Nginx konfigürasyonunu HTTPS'e geçirir.
+4. Otomatik yenileme için `certbot` servis döngüsünü başlatır.
+
+### Sonuç
+
+- HTTPS URL: `https://example.com`
+- HTTP istekleri otomatik olarak HTTPS'e yönlendirilir.
+- Sertifika yenileme arka planda düzenli olarak denenir.
+
 ## Teslim Kontrol Listesi
 
 - `npm run lint`

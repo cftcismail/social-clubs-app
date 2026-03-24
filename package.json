@@ -11,7 +11,8 @@
     "db:seed": "node scripts/run-sql.mjs db/002_seed.sql",
     "docker:up": "docker compose up -d --build",
     "docker:down": "docker compose down",
-    "docker:reset": "docker compose down -v; docker compose up -d --build"
+    "docker:reset": "docker compose down -v; docker compose up -d --build",
+    "ssl:init": "powershell -ExecutionPolicy Bypass -File ./scripts/init-ssl.ps1"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

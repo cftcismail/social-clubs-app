@@ -31,9 +31,36 @@ services:
       NODE_ENV: production
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/social_clubs
       PG_POOL_MAX: 20
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: social-clubs-nginx
+    depends_on:
+      - app
     ports:
-      - "3000:3000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - certbot_www:/var/www/certbot
+      - certbot_etc:/etc/letsencrypt
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: social-clubs-certbot
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_etc:/etc/letsencrypt
+    entrypoint: >
+      sh -c "trap exit TERM; while :; do
+        certbot renew --webroot -w /var/www/certbot --quiet;
+        sleep 12h;
+      done"
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  certbot_www:
+  certbot_etc:
