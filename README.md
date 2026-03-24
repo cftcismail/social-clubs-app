@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kurumsal Sosyal Kulüp Platformu
 
-## Getting Started
+Bu proje, şirket içi sosyal kulüplerin yönetimi ve çalışan etkileşimi için hazırlanmış teslime uygun bir web uygulamasıdır.
 
-First, run the development server:
+## Ürün Kapsamı
+
+- Kimlik doğrulama: şirket e-posta + şifre ile kayıt/giriş/çıkış
+- Rol bazlı yetkilendirme: `USER`, `CLUB_MANAGER`, `ADMIN`
+- Kullanıcı alanı: kulüp listeleme, kulübe katılma, gönderi paylaşımı, duyuru/etkinlik/bildirim görünümü
+- Kulüp yönetimi: kulüp oluşturma, duyuru yayınlama, etkinlik planlama
+- Admin yönetimi: kullanıcı rol güncelleme, kulüp aktif/pasif yönetimi, özet metrikler
+- Operasyonel katman: PostgreSQL + `node-postgres (pg)`, SQL migration + seed, sağlık kontrol endpoint’i
+
+## Teknoloji
+
+- Next.js 16 (App Router, TypeScript)
+- Tailwind CSS
+- PostgreSQL
+- node-postgres (`pg`)
+- bcryptjs, zod
+
+## Kurulum
+
+1. Bağımlılıkları yükleyin:
+
+	```bash
+	npm install
+	```
+
+2. Ortam değişkenlerini hazırlayın:
+
+	```bash
+	cp .env.example .env.local
+	```
+
+	Windows PowerShell için:
+
+	```powershell
+	Copy-Item .env.example .env.local
+	```
+
+3. `.env.local` içindeki `DATABASE_URL` değerini kendi PostgreSQL bilginize göre düzenleyin.
+
+4. Veritabanı şemasını uygulayın:
+
+	```bash
+	npm run db:migrate
+	```
+
+5. Demo verileri yükleyin:
+
+	```bash
+	npm run db:seed
+	```
+
+6. Uygulamayı başlatın:
+
+	```bash
+	npm run dev
+	```
+
+7. Tarayıcıdan açın: `http://localhost:3000`
+
+## Demo Hesaplar
+
+- Admin: `admin@company.local` / `Passw0rd!`
+- Kulüp Yöneticisi: `manager@company.local` / `Passw0rd!`
+- Kullanıcı: `user@company.local` / `Passw0rd!`
+
+## API / Operasyon
+
+- Sağlık kontrolü: `GET /api/health`
+- Migration dosyası: `db/001_init.sql`
+- Seed dosyası: `db/002_seed.sql`
+
+## Docker ile Tek Komut Deployment
+
+### Ön Koşul
+
+- Docker Desktop kurulu ve çalışır durumda olmalı.
+
+### Ayağa Kaldırma
+
+Tek komutla app + postgres başlatmak için:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run docker:up
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+veya PowerShell scripti:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+./scripts/up.ps1
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Erişim:
 
-## Learn More
+- Uygulama: `http://localhost:3000`
+- Health endpoint: `http://localhost:3000/api/health`
 
-To learn more about Next.js, take a look at the following resources:
+### Durdurma
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run docker:down
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+veya:
 
-## Deploy on Vercel
+```powershell
+./scripts/down.ps1
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Veritabanını Sıfırlama (init + seed yeniden)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run docker:reset
+```
+
+veya:
+
+```powershell
+./scripts/reset-db.ps1
+```
+
+## Teslim Kontrol Listesi
+
+- `npm run lint`
+- `npm run build`
+- `GET /api/health` yanıtı: `status=ok`
+- Demo hesaplarla giriş ve rol bazlı panellerin doğrulanması
+
+## Notlar
+
+- Mesajlaşma tabloları ve veri modeli hazırlanmıştır; gerçek zamanlı kanal (WebSocket) ikinci faz için planlanmıştır.
+- Güvenlik için şifreler `bcrypt` ile hashlenir, oturumlar `httpOnly` cookie + session tablosu ile yönetilir.
